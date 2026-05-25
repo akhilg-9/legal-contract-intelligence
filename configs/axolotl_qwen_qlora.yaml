@@ -1,0 +1,82 @@
+# Axolotl config — clause-extractor QLoRA.
+# Equivalent to the TRL path in src/.../finetune/train.py; pick whichever
+# ergonomics you prefer.
+#
+# Run on a single A100 80GB or 2x A10 40GB:
+#     accelerate launch -m axolotl.cli.train configs/axolotl_qwen_qlora.yaml
+#
+# After training, merge the adapter:
+#     python -m axolotl.cli.merge_lora configs/axolotl_qwen_qlora.yaml
+
+base_model: Qwen/Qwen2.5-7B-Instruct
+model_type: AutoModelForCausalLM
+tokenizer_type: AutoTokenizer
+
+# 4-bit quantization (QLoRA)
+load_in_4bit: true
+bnb_4bit_quant_type: nf4
+bnb_4bit_use_double_quant: true
+bnb_4bit_compute_dtype: bfloat16
+
+# LoRA
+adapter: lora
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+lora_bias: none
+
+# Dataset — Axolotl expects ShareGPT or chat-style; our `messages` JSONL fits chat_template format.
+datasets:
+  - path: data/finetune/synthesized/train.jsonl
+    type: chat_template
+    field_messages: messages
+    role_map:
+      user: user
+      assistant: assistant
+      system: system
+
+# Evaluation
+val_set_size: 0.0
+test_datasets:
+  - path: data/finetune/eval/heldout.jsonl
+    type: chat_template
+    field_messages: messages
+    role_map:
+      user: user
+      assistant: assistant
+      system: system
+    split: train
+evals_per_epoch: 4
+
+# Sequence
+sequence_len: 2048
+sample_packing: false
+pad_to_sequence_len: true
+
+# Training
+output_dir: ./runs/qlora-clause-extractor-axolotl
+num_epochs: 2
+micro_batch_size: 4
+gradient_accumulation_steps: 4
+optimizer: paged_adamw_8bit
+learning_rate: 2.0e-4
+lr_scheduler: cosine
+warmup_ratio: 0.03
+bf16: true
+tf32: true
+gradient_checkpointing: true
+flash_attention: true
+logging_steps: 20
+saves_per_epoch: 2
+save_total_limit: 3
+
+# Determinism
+seed: 42
