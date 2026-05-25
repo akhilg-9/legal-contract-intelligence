@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+.env.local
+.ipynb_checkpoints/
+.DS_Store
+.vscode/
+.idea/
+.pytest_cache/
+.cache/
+dist/
+build/
+*.log
+
+# Local model + index data
+.models/
+qdrant_storage/
+data/cache/
+data/edgar_raw/
+
+# Langfuse self-host (Phase 4)
+langfuse_data/

@@ -1,0 +1,40 @@
+MUTUAL NON-DISCLOSURE AGREEMENT
+
+This Mutual Non-Disclosure Agreement (this "Agreement") is entered into as of January 14, 2026 (the "Effective Date") by and between Acme Robotics, Inc., a Delaware corporation with offices at 1500 Hanover Street, Palo Alto, CA 94304 ("Acme"), and Betacorp Systems Ltd., an Ontario corporation with offices at 200 King Street West, Toronto, ON M5H 3T4 ("Betacorp"). Acme and Betacorp are each referred to as a "Party" and collectively as the "Parties."
+
+1. Purpose.
+The Parties wish to explore a potential business relationship relating to the integration of Acme's industrial-robotics platform with Betacorp's vision-system software (the "Purpose"). In connection with the Purpose, each Party may disclose to the other certain confidential and proprietary information.
+
+2. Definition of Confidential Information.
+"Confidential Information" means any information disclosed by one Party (the "Discloser") to the other Party (the "Recipient"), whether orally, in writing, or in any other tangible or intangible form, that is designated as confidential or that, given the nature of the information or the circumstances of disclosure, a reasonable person would understand to be confidential. Confidential Information includes, without limitation, technical data, trade secrets, source code, product plans, customer lists, financial information, and unpublished pricing.
+
+3. Obligations.
+The Recipient shall (a) use the Confidential Information solely for the Purpose; (b) protect the Confidential Information using at least the same degree of care it uses for its own confidential information of similar sensitivity, and in no event less than a reasonable degree of care; and (c) limit access to the Confidential Information to employees, contractors, and advisors who have a need to know and who are bound by confidentiality obligations no less restrictive than those in this Agreement.
+
+4. Exclusions.
+Confidential Information does not include information that the Recipient can demonstrate by written records: (i) was already known to the Recipient without obligation of confidentiality at the time of disclosure; (ii) is or becomes publicly available through no fault of the Recipient; (iii) is rightfully received from a third party without breach of any confidentiality obligation; or (iv) is independently developed by the Recipient without use of or reference to the Confidential Information.
+
+5. Term.
+This Agreement commences on the Effective Date and continues for a period of three (3) years thereafter, unless earlier terminated by either Party upon thirty (30) days' written notice. The obligations in Section 3 shall survive termination of this Agreement for an additional period of five (5) years with respect to trade secrets, which shall remain protected for so long as they qualify as trade secrets under applicable law.
+
+6. Return or Destruction.
+Upon written request of the Discloser or upon termination of this Agreement, the Recipient shall promptly return or, at the Discloser's option, destroy all Confidential Information in its possession and certify such destruction in writing within ten (10) business days.
+
+7. No License.
+No license or other right is granted to the Recipient under any intellectual property rights of the Discloser, except the limited right to use the Confidential Information for the Purpose.
+
+8. Remedies.
+The Parties acknowledge that any breach of this Agreement may cause irreparable harm for which monetary damages would be inadequate, and that the non-breaching Party shall be entitled to seek injunctive relief in addition to any other remedies available at law or in equity.
+
+9. Governing Law; Venue.
+This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware, without regard to its conflicts-of-laws principles. The Parties consent to the exclusive jurisdiction and venue of the state and federal courts located in Wilmington, Delaware.
+
+10. Entire Agreement; Amendments.
+This Agreement constitutes the entire agreement between the Parties with respect to the subject matter hereof and supersedes all prior or contemporaneous agreements, whether oral or written. No amendment is effective unless in writing and signed by both Parties.
+
+ACME ROBOTICS, INC.                       BETACORP SYSTEMS LTD.
+
+By: /s/ Priya Iyer                        By: /s/ Marcus Lin
+Name: Priya Iyer                          Name: Marcus Lin
+Title: Chief Operating Officer            Title: General Counsel
+Date: January 14, 2026                    Date: January 14, 2026

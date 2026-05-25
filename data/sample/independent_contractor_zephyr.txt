@@ -1,0 +1,43 @@
+INDEPENDENT CONTRACTOR AGREEMENT
+
+This Independent Contractor Agreement (this "Agreement") is entered into as of February 1, 2026 (the "Effective Date") by and between Zephyr Health, Inc., a Delaware corporation ("Company"), and Daniela Rojas, an individual residing at 4220 Pearl Street, Boulder, CO 80301 ("Contractor").
+
+1. Services.
+Contractor shall provide consulting services to Company in the area of clinical-data integration as described in Exhibit A (the "Services"). Contractor will determine the manner and means by which the Services are performed, subject only to the reasonable directions of Company as to the results to be achieved.
+
+2. Term.
+The term of this Agreement commences on the Effective Date and continues for six (6) months unless earlier terminated as provided herein. Either Party may terminate this Agreement at any time, with or without cause, upon fifteen (15) days' written notice to the other Party.
+
+3. Compensation.
+Company will pay Contractor an hourly rate of one hundred eighty U.S. dollars ($180.00 USD) for time actually spent performing the Services, capped at one hundred sixty (160) hours per month. Contractor shall submit monthly invoices itemizing the Services performed; Company shall pay each invoice within thirty (30) days of receipt. Contractor is responsible for all expenses incurred in the performance of the Services, except expenses pre-approved in writing by Company.
+
+4. Independent Contractor Relationship.
+Contractor is an independent contractor and not an employee, agent, partner, or joint venturer of Company. Contractor is solely responsible for all taxes, withholdings, and other statutory or contractual obligations of any sort. Contractor shall not be entitled to participate in any of Company's employee benefit plans.
+
+5. Intellectual Property; Work Made for Hire.
+All deliverables, work product, inventions, discoveries, improvements, and other materials created by Contractor in the course of performing the Services (collectively, "Work Product") shall be deemed "works made for hire" to the extent permitted by law and shall be the sole and exclusive property of Company. To the extent any Work Product does not qualify as a work made for hire, Contractor hereby irrevocably assigns to Company all right, title, and interest in and to such Work Product, including all intellectual-property rights. Contractor shall execute all documents reasonably necessary to perfect Company's ownership.
+
+6. Confidentiality.
+Contractor acknowledges that in the course of performing the Services, Contractor may have access to confidential and proprietary information of Company ("Confidential Information"). Contractor shall hold all Confidential Information in confidence, use it solely for the benefit of Company, and not disclose it to any third party without the prior written consent of Company. Contractor's obligations under this Section shall survive termination of this Agreement for a period of five (5) years.
+
+7. Non-Solicitation.
+During the term of this Agreement and for a period of twelve (12) months thereafter, Contractor shall not, directly or indirectly, solicit for employment or engagement any employee or contractor of Company with whom Contractor had material contact during the term.
+
+8. Representations and Warranties.
+Contractor represents and warrants that: (a) Contractor has the right and authority to enter into and perform this Agreement; (b) the Services will be performed in a professional manner consistent with industry standards; and (c) the Work Product will not infringe the intellectual-property rights of any third party.
+
+9. Indemnification.
+Contractor shall indemnify, defend, and hold Company harmless from and against any and all third-party claims, losses, damages, and reasonable attorneys' fees arising out of or relating to Contractor's breach of any representation, warranty, or covenant in this Agreement, including any claim that the Work Product infringes the intellectual-property rights of a third party.
+
+10. Termination Consequences.
+Upon termination, (i) Contractor shall promptly return all Confidential Information and Company property; (ii) Company shall pay Contractor for Services properly performed through the effective date of termination; and (iii) the obligations in Sections 5 (IP), 6 (Confidentiality), 7 (Non-Solicitation), 9 (Indemnification), and 11 (Governing Law) shall survive.
+
+11. Governing Law.
+This Agreement shall be governed by and construed in accordance with the laws of the State of Colorado, without regard to its conflicts-of-laws principles.
+
+ZEPHYR HEALTH, INC.                       CONTRACTOR
+
+By: /s/ Aman Shah                         By: /s/ Daniela Rojas
+Name: Aman Shah                           Name: Daniela Rojas
+Title: VP, Engineering                    Date: February 1, 2026
+Date: February 1, 2026

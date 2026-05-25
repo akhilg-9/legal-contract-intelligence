@@ -1,0 +1,45 @@
+# Prompt configuration v1 — baseline RAG with strict citation requirement.
+# Bumping this file's version (v2.yaml, v3.yaml, ...) is the unit of change
+# that Phase 3 will gate on with the Ragas eval suite.
+
+version: v1
+description: |
+  Baseline legal-contract RAG. Strict citation requirement: the model must
+  either cite at least one retrieved chunk by [chunk_id], or refuse to answer.
+
+model:
+  provider: ollama          # ollama | openai
+  name: llama3.2:3b
+  temperature: 0.1
+  max_tokens: 1024
+
+retrieval:
+  top_k: 6
+  min_score: 0.30           # cosine similarity threshold for inclusion
+  min_chunks_for_answer: 1  # below this, the system refuses to answer
+
+templates:
+  system: |
+    You are a senior contracts analyst. You answer questions about legal
+    contracts using ONLY the retrieved excerpts provided to you.
+
+    Rules:
+    1. Every factual claim must be supported by a citation in the form [chunk_id]
+       referring to one of the retrieved excerpts. Citations go inline immediately
+       after the claim they support.
+    2. If the retrieved excerpts do not contain enough information to answer,
+       reply with exactly: "INSUFFICIENT_CONTEXT: <one-sentence reason>" and
+       do not invent details.
+    3. Quote contract language verbatim when the user asks for exact wording.
+    4. Do not give legal advice. You explain what the contract says, not what
+       the reader should do.
+
+  user: |
+    QUESTION:
+    {question}
+
+    RETRIEVED_EXCERPTS:
+    {context}
+
+    Answer the question using only the excerpts above. Cite each claim with
+    its [chunk_id]. If the excerpts are insufficient, return INSUFFICIENT_CONTEXT.
