@@ -23,6 +23,12 @@ from langchain_core.prompts import ChatPromptTemplate
 
 from .ingestion import chunk_document, parse_document
 from .llm import build_llm
+from .observability import (
+    estimate_cost,
+    finalize_trace,
+    get_langchain_callback,
+    trace_ask,
+)
 from .prompts import PromptConfig, load_prompt
 from .retrieval import retrieve as retrieve_chunks
 from .vectorstore import get_vector_store, upsert_chunks
@@ -137,45 +143,81 @@ class RagPipeline:
         return chunks
 
     def ask(self, question: str) -> Answer:
-        retrieved = self.retrieve(question)
+        retrieval_mode = self.prompt_config.retrieval.mode
+        model_label = f"{self.prompt_config.model.provider}:{self.prompt_config.model.name}"
 
-        if len(retrieved) < self.prompt_config.retrieval.min_chunks_for_answer:
-            return Answer(
+        with trace_ask(
+            question=question,
+            prompt_version=self.prompt_config.version,
+            retrieval_mode=retrieval_mode,
+            model=model_label,
+        ) as trace:
+            retrieved = self.retrieve(question)
+
+            if len(retrieved) < self.prompt_config.retrieval.min_chunks_for_answer:
+                answer = Answer(
+                    question=question,
+                    answer="INSUFFICIENT_CONTEXT: no retrieved excerpts cleared the score threshold.",
+                    citations=[],
+                    retrieved=retrieved,
+                    insufficient_context=True,
+                    prompt_version=self.prompt_config.version,
+                )
+                finalize_trace(
+                    trace,
+                    answer=answer.answer,
+                    citations=[],
+                    insufficient_context=True,
+                    retrieved_chunks=0,
+                    extra_tags=["retrieval_empty"],
+                )
+                return answer
+
+            chain = self.prompt_template | self.llm | StrOutputParser()
+            callbacks = []
+            handler = get_langchain_callback()
+            if handler is not None:
+                callbacks.append(handler)
+            raw = chain.invoke(
+                {
+                    "question": question,
+                    "context": _format_excerpts(retrieved),
+                },
+                config={"callbacks": callbacks} if callbacks else None,
+            )
+
+            cited = sorted({m.group(1) for m in _CITATION_RE.finditer(raw)})
+            valid_ids = {c.chunk_id for c in retrieved}
+            cited = [c for c in cited if c in valid_ids]
+
+            insufficient = bool(_INSUFFICIENT_RE.match(raw))
+            if not insufficient and not cited:
+                raw = (
+                    "INSUFFICIENT_CONTEXT: model produced an uncited answer. "
+                    "Raw model output suppressed; see retrieved excerpts."
+                )
+                insufficient = True
+
+            answer = Answer(
                 question=question,
-                answer="INSUFFICIENT_CONTEXT: no retrieved excerpts cleared the score threshold.",
-                citations=[],
+                answer=raw,
+                citations=cited,
                 retrieved=retrieved,
-                insufficient_context=True,
+                insufficient_context=insufficient,
                 prompt_version=self.prompt_config.version,
             )
 
-        chain = self.prompt_template | self.llm | StrOutputParser()
-        raw = chain.invoke(
-            {
-                "question": question,
-                "context": _format_excerpts(retrieved),
-            }
-        )
+            # Best-effort token count for cost estimation. Falls back to char/4.
+            input_tokens = max(1, sum(len(c.text) for c in retrieved) // 4 + len(question) // 4)
+            output_tokens = max(1, len(raw) // 4)
+            cost = estimate_cost(input_tokens=input_tokens, output_tokens=output_tokens)
 
-        cited = sorted({m.group(1) for m in _CITATION_RE.finditer(raw)})
-        valid_ids = {c.chunk_id for c in retrieved}
-        cited = [c for c in cited if c in valid_ids]
-
-        insufficient = bool(_INSUFFICIENT_RE.match(raw))
-        if not insufficient and not cited:
-            # Model produced a confident answer with zero valid citations.
-            # Treat as a citation failure rather than silently accepting hallucination.
-            raw = (
-                "INSUFFICIENT_CONTEXT: model produced an uncited answer. "
-                "Raw model output suppressed; see retrieved excerpts."
+            finalize_trace(
+                trace,
+                answer=answer.answer,
+                citations=answer.citations,
+                insufficient_context=answer.insufficient_context,
+                retrieved_chunks=len(retrieved),
+                cost=cost,
             )
-            insufficient = True
-
-        return Answer(
-            question=question,
-            answer=raw,
-            citations=cited,
-            retrieved=retrieved,
-            insufficient_context=insufficient,
-            prompt_version=self.prompt_config.version,
-        )
+            return answer

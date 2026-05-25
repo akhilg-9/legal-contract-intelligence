@@ -29,5 +29,14 @@ class Settings:
         "Legal Contract Intelligence research@example.com",
     )
 
+    # ---- Phase 4: observability ----
+    langfuse_public_key: str = os.environ.get("LANGFUSE_PUBLIC_KEY", "")
+    langfuse_secret_key: str = os.environ.get("LANGFUSE_SECRET_KEY", "")
+    langfuse_host: str = os.environ.get("LANGFUSE_HOST", "http://localhost:3000")
+
+    cost_per_m_input_tokens_usd: float = float(os.environ.get("LCI_COST_PER_M_INPUT_TOKENS", "0") or 0)
+    cost_per_m_output_tokens_usd: float = float(os.environ.get("LCI_COST_PER_M_OUTPUT_TOKENS", "0") or 0)
+    cost_per_request_overhead_usd: float = float(os.environ.get("LCI_COST_PER_REQUEST_OVERHEAD_USD", "0") or 0)
+
 
 settings = Settings()
