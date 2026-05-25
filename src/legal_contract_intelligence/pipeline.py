@@ -24,6 +24,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from .ingestion import chunk_document, parse_document
 from .llm import build_llm
 from .prompts import PromptConfig, load_prompt
+from .retrieval import retrieve as retrieve_chunks
 from .vectorstore import get_vector_store, upsert_chunks
 
 
@@ -120,11 +121,20 @@ class RagPipeline:
         )
 
     def retrieve(self, question: str, k: Optional[int] = None) -> List[RetrievedChunk]:
-        k = k or self.prompt_config.retrieval.top_k
-        pairs = self.vector_store.similarity_search_with_score(question, k=k)
+        cfg = self.prompt_config.retrieval
+        k = k or cfg.top_k
+        pairs = retrieve_chunks(
+            question,
+            mode=cfg.mode,
+            top_k=k,
+            candidate_k=cfg.candidate_k,
+        )
         chunks = _docs_to_retrieved(pairs)
-        min_score = self.prompt_config.retrieval.min_score
-        return [c for c in chunks if c.score >= min_score]
+        # min_score only makes sense for cosine (dense) mode. For BM25 / RRF / reranker
+        # scores are unbounded, so we skip the threshold there.
+        if cfg.mode == "dense":
+            chunks = [c for c in chunks if c.score >= cfg.min_score]
+        return chunks
 
     def ask(self, question: str) -> Answer:
         retrieved = self.retrieve(question)

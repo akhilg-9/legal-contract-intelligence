@@ -22,6 +22,7 @@ from .config import settings
 from .ingestion.edgar import EdgarClient
 from .pipeline import RagPipeline, ingest_path
 from .prompts import load_prompt
+from .retrieval import RetrievalMode, retrieve as retrieve_chunks
 from .vectorstore import collection_info, get_vector_store
 
 app = typer.Typer(add_completion=False, no_args_is_help=True)
@@ -74,11 +75,12 @@ def ask(
 def search(
     query: str = typer.Argument(..., help="Retrieval-only query"),
     k: int = typer.Option(8, help="Top-k chunks to return"),
+    mode: str = typer.Option("reranked", help="dense | sparse | hybrid | reranked"),
+    candidate_k: int = typer.Option(20, help="Per-source breadth before fusion/rerank"),
 ) -> None:
     """Run retrieval only (no generation); inspect what the retriever surfaces."""
-    store = get_vector_store()
-    pairs = store.similarity_search_with_score(query, k=k)
-    table = Table(title=f"Top-{k} for: {query}")
+    pairs = retrieve_chunks(query, mode=mode, top_k=k, candidate_k=candidate_k)  # type: ignore[arg-type]
+    table = Table(title=f"Top-{k} for: {query}  (mode={mode})")
     table.add_column("chunk_id", style="cyan", no_wrap=True)
     table.add_column("score", justify="right")
     table.add_column("doc / page", style="dim")

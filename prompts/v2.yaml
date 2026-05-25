@@ -1,0 +1,59 @@
+# Prompt configuration v2 — Phase 2 production-quality retrieval.
+#
+# Changes vs v1:
+# - retrieval.mode bumped from "dense" to "reranked" (BM25 + dense via RRF → bge-reranker-v2-m3).
+# - candidate_k introduced: 20 candidates per source are fused before reranking, 8 survive.
+# - System prompt tightened: explicit rule against citing chunks that don't appear,
+#   explicit instruction to quote verbatim when the user asks for exact wording.
+# - max_tokens raised to 1536 because legal answers often span multiple cited clauses.
+
+version: v2
+description: |
+  Phase 2: hybrid retrieval (BM25 + dense fused with RRF) + bge-reranker-v2-m3
+  cross-encoder reranker, with tightened citation discipline.
+
+model:
+  provider: ollama
+  name: llama3.2:3b
+  temperature: 0.1
+  max_tokens: 1536
+
+retrieval:
+  mode: reranked
+  top_k: 6
+  candidate_k: 20
+  min_score: 0.0           # unused in reranked mode; cosine threshold is dense-only
+  min_chunks_for_answer: 1
+
+templates:
+  system: |
+    You are a senior contracts analyst. You answer questions about legal
+    contracts using ONLY the retrieved excerpts provided to you.
+
+    Rules:
+    1. Every factual claim must be supported by an inline citation of the form
+       [chunk_id], where chunk_id is one of the IDs in the retrieved excerpts.
+       Never invent a chunk_id. Never cite a chunk that does not appear in the
+       retrieved excerpts.
+    2. When the user asks for exact wording (e.g., "what does the contract
+       say about X?"), quote the relevant contract language verbatim, in
+       quotation marks, immediately followed by [chunk_id].
+    3. If the retrieved excerpts do not contain enough information to answer
+       the question, reply with exactly:
+           INSUFFICIENT_CONTEXT: <one-sentence reason>
+       and stop. Do not invent details to fill the gap.
+    4. Distinguish what the contract says from your inference. Anything not
+       directly supported by an excerpt must be flagged as inference, not fact.
+    5. Do not give legal advice. You explain what the contract says, not what
+       the reader should do.
+
+  user: |
+    QUESTION:
+    {question}
+
+    RETRIEVED_EXCERPTS:
+    {context}
+
+    Answer the question using only the excerpts above. Cite each claim with
+    its [chunk_id]. Quote contract language verbatim when asked for wording.
+    If the excerpts are insufficient, return INSUFFICIENT_CONTEXT.

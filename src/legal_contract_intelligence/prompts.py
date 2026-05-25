@@ -21,8 +21,10 @@ class ModelConfig(BaseModel):
 
 
 class RetrievalConfig(BaseModel):
+    mode: Literal["dense", "sparse", "hybrid", "reranked"] = "dense"
     top_k: int = Field(default=6, ge=1, le=50)
-    min_score: float = Field(default=0.0, ge=0.0, le=1.0)
+    candidate_k: int = Field(default=20, ge=1, le=200)
+    min_score: float = Field(default=0.0)
     min_chunks_for_answer: int = Field(default=1, ge=0)
 
 
