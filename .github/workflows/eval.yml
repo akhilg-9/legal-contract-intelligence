@@ -1,0 +1,120 @@
+name: rag-eval
+
+on:
+  pull_request:
+    paths:
+      - "prompts/**"
+      - "src/**"
+      - "evals/**"
+      - "requirements.txt"
+      - "pyproject.toml"
+      - ".github/workflows/eval.yml"
+  schedule:
+    # 03:00 UTC daily — full eval
+    - cron: "0 3 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  smoke:
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      qdrant:
+        image: qdrant/qdrant:v1.12.1
+        ports: ["6333:6333", "6334:6334"]
+    env:
+      LCI_LLM_PROVIDER: openai
+      LCI_OLLAMA_MODEL: gpt-4o-mini      # placeholder, not used when provider=openai
+      LCI_QDRANT_URL: http://localhost:6333
+      LCI_QDRANT_COLLECTION: contracts
+      LCI_EMBEDDING_DEVICE: cpu
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+      - name: Patch active prompt to use OpenAI (CI)
+        run: |
+          # Generate a CI-specific prompt config so the same eval code path runs unmodified.
+          python - <<'PY'
+          import yaml
+          from pathlib import Path
+          src = Path("prompts/v2.yaml").read_text()
+          cfg = yaml.safe_load(src)
+          cfg["model"]["provider"] = "openai"
+          cfg["model"]["name"] = "gpt-4o-mini"
+          cfg["version"] = "ci"
+          Path("prompts/ci.yaml").write_text(yaml.safe_dump(cfg, sort_keys=False))
+          PY
+      - name: Ingest sample contracts
+        run: lci ingest data/sample/
+      - name: Smoke eval
+        run: |
+          lci-eval --smoke --prompt ci --format json \
+              --out evals/results/ci-smoke.json \
+              --fail-under-faithfulness 0.60 \
+              --fail-under-refusal 0.50
+      - name: Upload eval results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-smoke
+          path: evals/results/*.json
+
+  full:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    services:
+      qdrant:
+        image: qdrant/qdrant:v1.12.1
+        ports: ["6333:6333", "6334:6334"]
+    env:
+      LCI_LLM_PROVIDER: openai
+      LCI_QDRANT_URL: http://localhost:6333
+      LCI_QDRANT_COLLECTION: contracts
+      LCI_EMBEDDING_DEVICE: cpu
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+      - name: Patch active prompt to use OpenAI (CI)
+        run: |
+          python - <<'PY'
+          import yaml
+          from pathlib import Path
+          src = Path("prompts/v2.yaml").read_text()
+          cfg = yaml.safe_load(src)
+          cfg["model"]["provider"] = "openai"
+          cfg["model"]["name"] = "gpt-4o-mini"
+          cfg["version"] = "ci"
+          Path("prompts/ci.yaml").write_text(yaml.safe_dump(cfg, sort_keys=False))
+          PY
+      - name: Ingest sample contracts
+        run: lci ingest data/sample/
+      - name: Full eval
+        run: |
+          lci-eval --prompt ci --format json \
+              --out evals/results/nightly-full.json \
+              --fail-under-faithfulness 0.70 \
+              --fail-under-refusal 0.80
+      - name: Upload eval results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-full
+          path: evals/results/*.json

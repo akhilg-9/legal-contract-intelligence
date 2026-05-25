@@ -31,6 +31,9 @@ dependencies = [
     "tiktoken>=0.7.0",
     # Retrieval (Phase 2)
     "rank-bm25>=0.2.2",
+    # Eval (Phase 3)
+    "ragas>=0.2.0",
+    "datasets>=2.20.0",
     # CLI / config / runtime
     "pyyaml>=6.0",
     "pydantic>=2.0.0",
@@ -44,6 +47,7 @@ dependencies = [
 
 [project.scripts]
 lci = "legal_contract_intelligence.cli:app"
+lci-eval = "legal_contract_intelligence.eval:app"
 
 [tool.setuptools.packages.find]
 where = ["src"]
